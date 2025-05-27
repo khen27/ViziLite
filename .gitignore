@@ -5,11 +5,14 @@ node_modules/
 
 # Expo
 .expo/
+.expo-shared/
 dist/
 web-build/
 expo-env.d.ts
 
 # Native
+ios/
+android/
 .kotlin/
 *.orig.*
 *.jks
@@ -22,13 +25,16 @@ expo-env.d.ts
 .metro-health-check*
 
 # debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # macOS
 .DS_Store
 *.pem
+
+# IDE
+.vscode/
 
 # local env files
 .env*.local
