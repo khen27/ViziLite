@@ -12,11 +12,6 @@
     "privacy": "public",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "updates": {
-      "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/450c34e1-59e4-465d-a435-f63481f36da2"
-    },
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -31,7 +26,6 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.karlvizi.ViziLite"
     },
     "web": {
@@ -39,14 +33,6 @@
     },
     "plugins": [
       "expo-font"
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "450c34e1-59e4-465d-a435-f63481f36da2"
-      }
-    },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    }
+    ]
   }
 }
