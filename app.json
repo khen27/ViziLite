@@ -9,6 +9,7 @@
       "ios",
       "android"
     ],
+    "privacy": "public",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
