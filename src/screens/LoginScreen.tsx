@@ -9,7 +9,8 @@ import {
   TouchableOpacity, 
   Platform, 
   Pressable, 
-  SafeAreaView
+  SafeAreaView,
+  ActivityIndicator 
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFonts, DMSans_400Regular, DMSans_500Medium } from '@expo-google-fonts/dm-sans';
@@ -19,7 +20,7 @@ import type { RootStackParamList } from '../../App';
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
-export default function LoginScreen() {
+const LoginScreen = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const [fontsLoaded] = useFonts({
     DMSans_400Regular,
@@ -27,7 +28,14 @@ export default function LoginScreen() {
   });
 
   if (!fontsLoaded) {
-    return null;
+    return (
+      <SafeAreaView style={styles.root}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#3888F6" />
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      </SafeAreaView>
+    );
   }
 
   return (
@@ -108,12 +116,22 @@ export default function LoginScreen() {
       </View>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#EAF2F9',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#3888F6',
   },
   container: {
     flex: 1,
@@ -245,4 +263,6 @@ const styles = StyleSheet.create({
     color: '#3888F6',
     textDecorationLine: 'underline',
   },
-}); 
+});
+
+export default LoginScreen; 

@@ -1,15 +1,20 @@
 import React from 'react';
-import { SafeAreaView, View, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { SafeAreaView, View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
-import { DMSans_400Regular, DMSans_500Medium } from '@expo-google-fonts/dm-sans';
+import { useFonts, DMSans_400Regular, DMSans_500Medium } from '@expo-google-fonts/dm-sans';
 import { LinearGradient } from 'expo-linear-gradient';
 
 type EmotionalCheckinNavigationProp = NativeStackNavigationProp<RootStackParamList, 'EmotionalCheckin'>;
 
-export default function EmotionalCheckin() {
+const EmotionalCheckin = () => {
   const navigation = useNavigation<EmotionalCheckinNavigationProp>();
+  const [fontsLoaded] = useFonts({
+    DMSans_400Regular,
+    DMSans_500Medium,
+  });
+
   const moods = [
     { emoji: '😀', label: 'Happy' },
     { emoji: '😕', label: 'Sad' },
@@ -18,6 +23,22 @@ export default function EmotionalCheckin() {
     { emoji: '🧘', label: 'Relaxed' },
     { emoji: '🎉', label: 'Social' },
   ];
+
+  const handleMoodSelect = (mood: string) => {
+    console.log('Selected mood:', mood);
+    navigation.navigate('Interests');
+  };
+
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#3888F6" />
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -35,7 +56,7 @@ export default function EmotionalCheckin() {
         {moods.map((m, i) => (
           <TouchableOpacity
             key={i}
-            onPress={() => console.log(m.label)}
+            onPress={() => handleMoodSelect(m.label)}
             style={[styles.moodButton, { width: buttonSize, height: buttonSize }]}
           >
             <LinearGradient
@@ -52,7 +73,7 @@ export default function EmotionalCheckin() {
       </View>
     </SafeAreaView>
   );
-}
+};
 
 const { width } = Dimensions.get('window');
 const buttonSize = (width - 60) / 2;  // 20px margin each side + 20px between
@@ -62,6 +83,16 @@ const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: '#EAF2F9', 
     alignItems: 'center' 
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#3888F6',
   },
   header: { 
     marginTop: 20 
@@ -116,4 +147,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFFFFF'
   },
-}); 
+});
+
+export default EmotionalCheckin; 
