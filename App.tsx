@@ -6,6 +6,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import EmotionalCheckin from './src/screens/EmotionalCheckin';
 import Interests from './src/screens/Interests';
 import ChatScreen from './src/screens/ChatScreen';
+import TripDetails from './src/screens/TripDetails';
 import { db } from './firebaseConfig';
 
 export type RootStackParamList = {
@@ -13,6 +14,7 @@ export type RootStackParamList = {
   EmotionalCheckin: undefined;
   Interests: undefined;
   Chat: { chatId?: string; userId?: string };
+  TripDetails: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -31,6 +33,7 @@ export default function App() {
             initialParams={{ chatId: 'global', userId: 'userA' }}
             options={{ title: 'Chat', headerShown: true }}
           />
+          <Stack.Screen name="TripDetails" component={TripDetails} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
