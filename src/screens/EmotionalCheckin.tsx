@@ -1,15 +1,20 @@
 import React from 'react';
-import { SafeAreaView, View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { SafeAreaView, View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
-import { DMSans_400Regular, DMSans_500Medium } from '@expo-google-fonts/dm-sans';
+import { useFonts, DMSans_400Regular, DMSans_500Medium } from '@expo-google-fonts/dm-sans';
 import { LinearGradient } from 'expo-linear-gradient';
 
 type EmotionalCheckinNavigationProp = NativeStackNavigationProp<RootStackParamList, 'EmotionalCheckin'>;
 
 const EmotionalCheckin = () => {
   const navigation = useNavigation<EmotionalCheckinNavigationProp>();
+  const [fontsLoaded] = useFonts({
+    DMSans_400Regular,
+    DMSans_500Medium,
+  });
+
   const moods = [
     { emoji: '😀', label: 'Happy' },
     { emoji: '😕', label: 'Sad' },
@@ -23,6 +28,17 @@ const EmotionalCheckin = () => {
     console.log('Selected mood:', mood);
     navigation.navigate('Interests');
   };
+
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#3888F6" />
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -67,6 +83,16 @@ const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: '#EAF2F9', 
     alignItems: 'center' 
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#3888F6',
   },
   header: { 
     marginTop: 20 
@@ -113,7 +139,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   emoji: { 
-    fontSize: 32,
+    fontSize: 64,
     marginBottom: 8
   },
   label: { 

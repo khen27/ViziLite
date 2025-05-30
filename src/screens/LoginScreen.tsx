@@ -9,7 +9,8 @@ import {
   TouchableOpacity, 
   Platform, 
   Pressable, 
-  SafeAreaView 
+  SafeAreaView,
+  ActivityIndicator 
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFonts, DMSans_400Regular, DMSans_500Medium } from '@expo-google-fonts/dm-sans';
@@ -27,7 +28,14 @@ const LoginScreen = () => {
   });
 
   if (!fontsLoaded) {
-    return null;
+    return (
+      <SafeAreaView style={styles.root}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#3888F6" />
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      </SafeAreaView>
+    );
   }
 
   return (
@@ -114,6 +122,16 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#EAF2F9',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#3888F6',
   },
   container: {
     flex: 1,
