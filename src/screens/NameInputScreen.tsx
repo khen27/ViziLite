@@ -51,7 +51,7 @@ const NameInputScreen = () => {
 
   const handleNext = () => {
     if (name.trim()) {
-      navigation.navigate('EmotionalCheckin');
+      navigation.navigate('Birthday');
     }
   };
 
