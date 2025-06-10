@@ -69,7 +69,7 @@ const SelfieScreen = () => {
   };
 
   const handleNext = () => {
-    navigation.navigate('EmotionalCheckin');
+    navigation.navigate('Interests');
   };
 
   const handleBack = () => {
