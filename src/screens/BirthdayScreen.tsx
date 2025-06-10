@@ -88,7 +88,7 @@ const BirthdayScreen = () => {
 
   const handleNext = () => {
     if (isValidDate(digits)) {
-      navigation.navigate('EmotionalCheckin');
+      navigation.navigate('Selfie');
     }
   };
 
