@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import LoginScreen from './src/screens/LoginScreen';
 import NameInputScreen from './src/screens/NameInputScreen';
 import BirthdayScreen from './src/screens/BirthdayScreen';
+import SelfieScreen from './src/screens/SelfieScreen';
 import EmotionalCheckin from './src/screens/EmotionalCheckin';
 import Interests from './src/screens/Interests';
 import ChatScreen from './src/screens/ChatScreen';
@@ -15,6 +16,7 @@ export type RootStackParamList = {
   Login: undefined;
   NameInput: undefined;
   Birthday: undefined;
+  Selfie: undefined;
   EmotionalCheckin: undefined;
   Interests: undefined;
   Chat: { chatId?: string; userId?: string };
@@ -31,6 +33,7 @@ export default function App() {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="NameInput" component={NameInputScreen} />
           <Stack.Screen name="Birthday" component={BirthdayScreen} />
+          <Stack.Screen name="Selfie" component={SelfieScreen} />
           <Stack.Screen name="EmotionalCheckin" component={EmotionalCheckin} />
           <Stack.Screen name="Interests" component={Interests} />
           <Stack.Screen
