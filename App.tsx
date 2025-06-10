@@ -6,6 +6,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import NameInputScreen from './src/screens/NameInputScreen';
 import BirthdayScreen from './src/screens/BirthdayScreen';
 import SelfieScreen from './src/screens/SelfieScreen';
+import InterestsScreen from './src/screens/InterestsScreen';
 import EmotionalCheckin from './src/screens/EmotionalCheckin';
 import Interests from './src/screens/Interests';
 import ChatScreen from './src/screens/ChatScreen';
@@ -34,8 +35,8 @@ export default function App() {
           <Stack.Screen name="NameInput" component={NameInputScreen} />
           <Stack.Screen name="Birthday" component={BirthdayScreen} />
           <Stack.Screen name="Selfie" component={SelfieScreen} />
+          <Stack.Screen name="Interests" component={InterestsScreen} />
           <Stack.Screen name="EmotionalCheckin" component={EmotionalCheckin} />
-          <Stack.Screen name="Interests" component={Interests} />
           <Stack.Screen
             name="Chat"
             component={ChatScreen}
