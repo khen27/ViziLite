@@ -65,7 +65,7 @@ const LoginScreen = () => {
           <TouchableOpacity 
             style={styles.button} 
             activeOpacity={0.8}
-            onPress={() => navigation.navigate('EmotionalCheckin')}
+            onPress={() => navigation.navigate('NameInput')}
           >
             <LinearGradient
               colors={["#7965E0", "#3888F6"]}

@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import LoginScreen from './src/screens/LoginScreen';
+import NameInputScreen from './src/screens/NameInputScreen';
 import EmotionalCheckin from './src/screens/EmotionalCheckin';
 import Interests from './src/screens/Interests';
 import ChatScreen from './src/screens/ChatScreen';
@@ -11,6 +12,7 @@ import { db } from './firebaseConfig';
 
 export type RootStackParamList = {
   Login: undefined;
+  NameInput: undefined;
   EmotionalCheckin: undefined;
   Interests: undefined;
   Chat: { chatId?: string; userId?: string };
@@ -25,6 +27,7 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="NameInput" component={NameInputScreen} />
           <Stack.Screen name="EmotionalCheckin" component={EmotionalCheckin} />
           <Stack.Screen name="Interests" component={Interests} />
           <Stack.Screen
