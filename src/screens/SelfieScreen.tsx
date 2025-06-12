@@ -16,6 +16,7 @@ import { useFonts, DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold } fro
 import * as ImagePicker from 'expo-image-picker';
 import { RootStackParamList } from '../../App';
 import { StatusBar as ExpoStatusBar, StatusBarStyle } from 'expo-status-bar';
+import Constants from 'expo-constants';
 
 type SelfieScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Selfie'>;
 
@@ -28,6 +29,8 @@ const SelfieScreen = () => {
     DMSans_500Medium,
     DMSans_600SemiBold,
   });
+
+  const isSimulator = Constants.platform?.ios?.simulator === true || Constants.platform?.android?.emulator === true;
 
   const requestPermissions = async () => {
     const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
@@ -54,15 +57,18 @@ const SelfieScreen = () => {
   };
 
   const uploadPhoto = async () => {
+    if (isSimulator) {
+      // On simulator, use placeholder image directly
+      setSelectedImage(require('../../assets/placeholder.png'));
+      return;
+    }
     await requestPermissions();
-    
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
     });
-
     if (!result.canceled && result.assets[0]) {
       setSelectedImage(result.assets[0].uri);
     }
@@ -112,7 +118,10 @@ const SelfieScreen = () => {
           <View style={styles.imageContainer}>
             {selectedImage ? (
               <TouchableOpacity onPress={uploadPhoto} activeOpacity={0.8} style={styles.selectedImageContainer}>
-                <Image source={{ uri: selectedImage }} style={styles.selectedImage} />
+                <Image 
+                  source={typeof selectedImage === 'string' ? { uri: selectedImage } : selectedImage} 
+                  style={styles.selectedImage} 
+                />
                 <TouchableOpacity onPress={uploadPhoto} style={styles.editButton} activeOpacity={0.8}>
                   <Image source={require('../../assets/edit-image.png')} style={styles.editIcon} resizeMode="contain" />
                 </TouchableOpacity>
@@ -143,6 +152,16 @@ const SelfieScreen = () => {
 
             <TouchableOpacity onPress={takePhoto} activeOpacity={0.7}>
               <Text style={styles.takePhotoText}>Take a photo</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={() => {
+                setSelectedImage(require('../../assets/placeholder.png'));
+                navigation.navigate('Interests');
+              }} 
+              activeOpacity={0.7}
+              style={styles.skipContainer}
+            >
+              <Text style={styles.skipText}>Skip for now</Text>
             </TouchableOpacity>
           </>
         )}
@@ -361,6 +380,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: -0.05,
     color: '#FFFFFF',
+  },
+  skipContainer: {
+    marginTop: 20,
+  },
+  skipText: {
+    fontFamily: 'DMSans_500Medium',
+    fontSize: 16,
+    lineHeight: 21,
+    textAlign: 'center',
+    letterSpacing: -0.05,
+    color: '#B2B2B2',
+    textDecorationLine: 'underline',
   },
 });
 
