@@ -15,19 +15,18 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { RootStackParamList } from '../../App';
 
-// Type for navigation
-type InstagramNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Instagram'>;
+type LinkedInNavigationProp = NativeStackNavigationProp<RootStackParamList, 'LinkedIn'>;
 
-const InstagramScreen = () => {
-  const navigation = useNavigation<InstagramNavigationProp>();
-  const [instagram, setInstagram] = useState('');
+const LinkedInScreen = () => {
+  const navigation = useNavigation<LinkedInNavigationProp>();
+  const [linkedin, setLinkedin] = useState('');
 
   const handleContinue = () => {
-    navigation.navigate('LinkedIn');
+    navigation.navigate('EmotionalCheckin');
   };
 
   const handleSkip = () => {
-    navigation.navigate('LinkedIn');
+    navigation.navigate('EmotionalCheckin');
   };
 
   return (
@@ -48,25 +47,25 @@ const InstagramScreen = () => {
           </View>
 
           {/* Title */}
-          <Text style={styles.title}>What's your Instagram?</Text>
+          <Text style={styles.title}>Link your LinkedIn?</Text>
 
           {/* Subtitle */}
           <Text style={styles.subtitle}>
-            We'll use this to connect you with friends and personalize your experience.
+            This helps us verify you're a real traveler – and earn trust faster.
           </Text>
 
           {/* Input */}
           <View style={styles.inputContainer}>
-            <Image source={require('../../assets/icon-instagram.png')} style={styles.inputIcon} />
+            <Image source={require('../../assets/icon-link.png')} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
-              placeholder="@yourhandle"
+              placeholder="LinkedIn profile url"
               placeholderTextColor="#B2B2B2"
-              value={instagram}
-              onChangeText={setInstagram}
+              value={linkedin}
+              onChangeText={setLinkedin}
               autoCapitalize="none"
               autoCorrect={false}
-              keyboardType="default"
+              keyboardType="url"
               returnKeyType="done"
             />
           </View>
@@ -77,18 +76,18 @@ const InstagramScreen = () => {
               <Text style={styles.skipButtonText}>Skip</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.continueButton, !instagram && styles.continueButtonDisabled]}
+              style={[styles.continueButton, !linkedin && styles.continueButtonDisabled]}
               onPress={handleContinue}
-              activeOpacity={instagram ? 0.8 : 1}
-              disabled={!instagram}
+              activeOpacity={linkedin ? 0.8 : 1}
+              disabled={!linkedin}
             >
               <LinearGradient
-                colors={instagram ? ["#7468E2", "#3C87F5"] : ["#CCCCCC", "#AAAAAA"]}
+                colors={linkedin ? ["#7468E2", "#3C87F5"] : ["#CCCCCC", "#AAAAAA"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.continueButtonGradient}
               >
-                <Text style={styles.continueButtonText}>Continue</Text>
+                <Text style={styles.continueButtonText}>Next</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -231,4 +230,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InstagramScreen; 
+export default LinkedInScreen; 
