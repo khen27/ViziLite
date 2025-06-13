@@ -5,14 +5,17 @@ import ProfileScreen from '../screens/ProfileScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import ChatScreen from '../screens/ChatScreen';
 import TripDetails from '../screens/TripDetails';
+import CityDateScreen from '../screens/CityDateScreen';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const TabNavigator = () => {
-  const [activeTab, setActiveTab] = useState('Notifications');
+  const [activeTab, setActiveTab] = useState('Plan');
 
   const renderScreen = () => {
     switch (activeTab) {
+      case 'Plan':
+        return <CityDateScreen />;
       case 'Home':
         return <TripDetails />;
       case 'Chat':
@@ -41,19 +44,16 @@ const TabNavigator = () => {
           end={{ x: 1, y: 0 }}
         >
           <View style={styles.navigationBar}>
-            {/* Question/Home Icon Container */}
+            {/* Plan Icon Container */}
             <TouchableOpacity 
-              style={[styles.iconContainer, activeTab === 'Home' && styles.activeIconContainer]} 
+              style={[styles.iconContainer, activeTab === 'Plan' && styles.activeIconContainer]} 
               activeOpacity={0.7}
-              onPress={() => setActiveTab('Home')}
+              onPress={() => setActiveTab('Plan')}
             >
-              <Image 
-                source={require('../../assets/nav-feedback.png')} 
-                style={[
-                  styles.iconImage,
-                  { tintColor: activeTab === 'Home' ? '#FFFFFF' : '#90C2FF' }
-                ]} 
-              />
+              <Text style={[
+                styles.iconText,
+                { color: activeTab === 'Plan' ? '#FFFFFF' : '#90C2FF' }
+              ]}>📅</Text>
             </TouchableOpacity>
 
             {/* Message Icon Container */}
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 0,
-    gap: 24,
+    gap: 16,
     marginTop: 10,
   },
   iconContainer: {
@@ -156,6 +156,10 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     resizeMode: 'contain',
+  },
+  iconText: {
+    fontSize: 24,
+    textAlign: 'center',
   },
   homeIndicator: {
     width: 134,

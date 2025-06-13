@@ -1,6 +1,13 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { v4 as uuidv4 } from 'uuid';
+// Using a simple UUID alternative for React Native
+const generateUUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 
@@ -9,12 +16,14 @@ export interface User {
   uid: string;
   name?: string;
   photoUrl?: string;
+  bio?: string;
+  interests?: string[];
 }
 
 // Define AuthContext type
 export interface AuthContextType {
   user: User | null;
-  setProfile: (name: string, photoUrl?: string) => Promise<void>;
+  setProfile: (profileData: Partial<Omit<User, 'uid'>>) => Promise<void>;
 }
 
 // Create AuthContext
@@ -38,7 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       let uid = await AsyncStorage.getItem('uid');
       
       if (!uid) {
-        uid = uuidv4();
+        uid = generateUUID();
         await AsyncStorage.setItem('uid', uid);
       }
 
@@ -60,22 +69,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       console.error('Error initializing user:', error);
       // Fallback: create user with generated UID
-      const fallbackUid = uuidv4();
+      const fallbackUid = generateUUID();
       setUser({ uid: fallbackUid });
     }
   };
 
-  const setProfile = async (name: string, photoUrl?: string) => {
+  const setProfile = async (profileData: Partial<Omit<User, 'uid'>>) => {
     if (!user) {
       throw new Error('No user found');
     }
 
     try {
-      const profileData: Partial<User> = { name };
-      if (photoUrl) {
-        profileData.photoUrl = photoUrl;
-      }
-
       // Write to Firestore (merge with existing data)
       const userDocRef = doc(db, 'users', user.uid);
       await setDoc(userDocRef, profileData, { merge: true });
