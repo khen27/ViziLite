@@ -25,7 +25,7 @@ import {
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
 
-type ChatScreenProps = NativeStackScreenProps<RootStackParamList, 'Chat'>;
+type ChatScreenProps = Partial<NativeStackScreenProps<RootStackParamList, 'Chat'>>;
 
 interface ChatMessage {
   _id: string;
@@ -40,7 +40,7 @@ interface ChatMessage {
 const { height: screenHeight } = Dimensions.get('window');
 
 export default function ChatScreen({ route }: ChatScreenProps) {
-  const { chatId = 'global', userId = 'userA' } = route.params || {};
+  const { chatId = 'global', userId = 'userA' } = route?.params || {};
   const messagesRef = collection(db, 'chats', chatId, 'messages');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
