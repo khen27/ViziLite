@@ -22,11 +22,11 @@ const LinkedInScreen = () => {
   const [linkedin, setLinkedin] = useState('');
 
   const handleContinue = () => {
-    navigation.navigate('EmotionalCheckin');
+    navigation.navigate('MainTabs');
   };
 
   const handleSkip = () => {
-    navigation.navigate('EmotionalCheckin');
+    navigation.navigate('MainTabs');
   };
 
   return (

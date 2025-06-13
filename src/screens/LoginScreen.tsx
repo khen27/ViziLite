@@ -86,7 +86,7 @@ const LoginScreen = () => {
           <TouchableOpacity 
             style={[styles.button, styles.googleButton]} 
             activeOpacity={0.8}
-            onPress={() => navigation.navigate('TripDetails')}
+            onPress={() => navigation.navigate('MainTabs')}
           >
             <View style={styles.buttonContent}>
               <Image
