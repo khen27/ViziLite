@@ -9,12 +9,14 @@ export interface User {
   uid: string;
   name?: string;
   photoUrl?: string;
+  bio?: string;
+  interests?: string[];
 }
 
 // Define AuthContext type
 export interface AuthContextType {
   user: User | null;
-  setProfile: (name: string, photoUrl?: string) => Promise<void>;
+  setProfile: (profileData: Partial<Omit<User, 'uid'>>) => Promise<void>;
 }
 
 // Create AuthContext
@@ -65,17 +67,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const setProfile = async (name: string, photoUrl?: string) => {
+  const setProfile = async (profileData: Partial<Omit<User, 'uid'>>) => {
     if (!user) {
       throw new Error('No user found');
     }
 
     try {
-      const profileData: Partial<User> = { name };
-      if (photoUrl) {
-        profileData.photoUrl = photoUrl;
-      }
-
       // Write to Firestore (merge with existing data)
       const userDocRef = doc(db, 'users', user.uid);
       await setDoc(userDocRef, profileData, { merge: true });

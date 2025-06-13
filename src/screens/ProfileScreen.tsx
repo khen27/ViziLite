@@ -1,449 +1,262 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
-  SafeAreaView,
-  Image,
+  TextInput,
   TouchableOpacity,
+  Image,
+  StyleSheet,
   ScrollView,
-  ImageBackground,
-  Share,
-  StatusBar,
-  Dimensions,
+  Alert,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useFonts, DMSans_400Regular, DMSans_500Medium, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
-import Svg, { Path, Mask, G } from 'react-native-svg';
-import { useUser } from '../context/UserContext';
+import { AuthContext } from '../context/AuthContext';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../firebaseConfig';
 
-const interests = [
-  { emoji: '🏸', label: 'Badminton' },
-  { emoji: '🍽️', label: 'Food' },
-  { emoji: '🥤', label: 'Drinks' },
-  { emoji: '🚴', label: 'Cycling' },
-  { emoji: '🍷', label: 'Wine' },
-];
+interface ProfileData {
+  name?: string;
+  interests?: string[];
+  photoUrl?: string;
+}
 
 const ProfileScreen = () => {
-  const [fontsLoaded] = useFonts({
-    DMSans_400Regular,
-    DMSans_500Medium,
-    DMSans_700Bold,
-  });
-  const { user } = useUser();
+  const authContext = useContext(AuthContext);
+  
+  if (!authContext) {
+    throw new Error('ProfileScreen must be used within AuthProvider');
+  }
 
-  const handleShare = async () => {
+  const { user, setProfile } = authContext;
+  
+  const [bio, setBio] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [profileData, setProfileData] = useState<ProfileData>({});
+  const [saving, setSaving] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (user?.uid) {
+      fetchUserProfile();
+    }
+  }, [user?.uid]);
+
+  const fetchUserProfile = async () => {
+    if (!user?.uid) return;
+
     try {
-      await Share.share({
-        message: "Hey, this is my profile on Vizi! You should join me ✨",
-        url: "https://vizi.app/profile/" + encodeURIComponent(user.name),
-      });
+      setLoading(true);
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        
+        setProfileData({
+          name: userData.name || '',
+          interests: userData.interests || [],
+          photoUrl: userData.photoUrl || '',
+        });
+        
+        setBio(userData.bio || '');
+      }
     } catch (error) {
-      console.error("Error sharing profile:", error);
+      console.error('Error fetching user profile:', error);
+      Alert.alert('Error', 'Failed to load profile data');
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!fontsLoaded) {
+  const handleSaveBio = async () => {
+    try {
+      setSaving(true);
+      await setProfile({ bio });
+      Alert.alert('Success', 'Bio updated successfully!');
+    } catch (error) {
+      console.error('Error saving bio:', error);
+      Alert.alert('Error', 'Failed to save bio. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
     return (
-      <SafeAreaView style={styles.loadingContainer}>
-        <Text>Loading...</Text>
-      </SafeAreaView>
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
     );
   }
 
   return (
-    <View style={styles.mainContainer}>
-      <LinearGradient
-        colors={['#7389EC', '#4694FD']}
-        style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-      >
-        <View style={styles.contentContainer}>
-          <StatusBar barStyle="light-content" />
-          
-          {/* Header/Background Image */}
-          <ImageBackground 
-            source={require('../../assets/vizi-mvp-assets.png/gym-background.png')} 
-            style={styles.headerImage}
-            imageStyle={{ opacity: 1 }}
-          >
-            <View style={styles.gradientOverlay} />
-            <LinearGradient
-              colors={['transparent', '#EAF2F9']}
-              style={styles.headerGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
-            />
-            
-            {/* Header Row */}
-            <View style={styles.headerRow}>
-              <View style={styles.transparentView} />
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <View style={styles.card}>
+        {/* Profile Photo */}
+        <View style={styles.photoContainer}>
+          {profileData.photoUrl ? (
+            <Image source={{ uri: profileData.photoUrl }} style={styles.profilePhoto} />
+          ) : (
+            <View style={styles.placeholderPhoto}>
+              <Text style={styles.placeholderText}>No Photo</Text>
             </View>
-          </ImageBackground>
-          
-          {/* Profile Image */}
-          <View style={styles.profileImageContainer}>
-            <Image 
-              source={user.avatar ? { uri: user.avatar } : require('../../assets/vizi-mvp-assets.png/profile-pic.png')}
-              style={styles.profileImage}
-            />
-          </View>
-          
-          <View style={styles.contentWrapper}>
-            <SafeAreaView style={styles.safeArea}>
-              <ScrollView 
-                style={styles.scrollView}
-                contentContainerStyle={styles.scrollContent}
-                keyboardShouldPersistTaps="handled"
-              >
-                <View style={styles.content}>
-                  {/* Profile information */}
-                  <View style={styles.profileInfoContainer}>
-                    {/* Full name */}
-                    <Text style={styles.fullNameText}>{user.name}</Text>
-                    
-                    {/* Location information */}
-                    <View style={styles.locationContainer}>
-                      <View style={styles.flagContainer}>
-                        <Svg width="24" height="18" viewBox="0 0 78 59" fill="none">
-                          <Mask id="mask0_1_27" style={{maskType: 'luminance'}} maskUnits="userSpaceOnUse" x="0" y="0" width="78" height="59">
-                            <Path d="M0 0H77.4V58.05H0V0Z" fill="white"/>
-                          </Mask>
-                          <G mask="url(#mask0_1_27)">
-                            <Path fillRule="evenodd" clipRule="evenodd" d="M0 0V58.05H77.4V0H0Z" fill="#E31D1C"/>
-                            <Mask id="mask1_1_27" style={{maskType: 'luminance'}} maskUnits="userSpaceOnUse" x="0" y="0" width="78" height="59">
-                              <Path fillRule="evenodd" clipRule="evenodd" d="M0 0V58.05H77.4V0H0Z" fill="white"/>
-                            </Mask>
-                            <G mask="url(#mask1_1_27)">
-                              <Path fillRule="evenodd" clipRule="evenodd" d="M0 -4.83749V29.025H77.4V-4.83749H0Z" fill="#F7FCFF"/>
-                            </G>
-                            <Path fillRule="evenodd" clipRule="evenodd" d="M0 0V58.05L43.5375 29.025L0 0Z" fill="#3D58DB"/>
-                          </G>
-                        </Svg>
-                      </View>
-                      <Text style={styles.locationText}>{user.location}</Text>
-                      <Text style={styles.dot}>•</Text>
-                      <Text style={styles.friendsText}>{user.friends}</Text>
-                    </View>
-                    
-                    {/* Interest icons */}
-                    <View style={styles.interestsWrapper}>
-                      <ScrollView 
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={styles.interestsContainer}
-                      >
-                        {(user.interests.length > 0 ? user.interests : [
-                          { emoji: '✈️', label: 'Travel' },
-                          { emoji: '🍔', label: 'Food' },
-                          { emoji: '🌊', label: 'Sea' },
-                          { emoji: '🏸', label: 'Badminton' },
-                          { emoji: '☕', label: 'Coffee' },
-                        ]).slice(0, 5).map((interest, index) => (
-                          <View key={index} style={styles.interestItem}>
-                            <View style={styles.interestIconButton}>
-                              <Text style={styles.interestEmoji}>{interest.emoji}</Text>
-                            </View>
-                            <Text style={styles.interestLabel} numberOfLines={1} ellipsizeMode="tail">{interest.label}</Text>
-                          </View>
-                        ))}
-                      </ScrollView>
-                    </View>
-                    
-                    {/* Profile action buttons */}
-                    <View style={styles.buttonContainer}>
-                      <TouchableOpacity style={styles.editButton}>
-                        <Text style={styles.editButtonText}>Edit Profile</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-                        <Text style={styles.shareButtonText}>Share Profile</Text>
-                      </TouchableOpacity>
-                    </View>
-                    
-                    {/* Bio text */}
-                    <Text style={styles.bioText}>{user.bio}</Text>
-                  </View>
-                </View>
-              </ScrollView>
-            </SafeAreaView>
-          </View>
+          )}
         </View>
-        
-        <View style={styles.homeIndicator} />
-      </LinearGradient>
-    </View>
+
+        {/* Name */}
+        <View style={styles.infoSection}>
+          <Text style={styles.label}>Name:</Text>
+          <Text style={styles.infoText}>
+            {profileData.name || 'No name set'}
+          </Text>
+        </View>
+
+        {/* Interests */}
+        <View style={styles.infoSection}>
+          <Text style={styles.label}>Interests:</Text>
+          <Text style={styles.infoText}>
+            {profileData.interests && profileData.interests.length > 0
+              ? profileData.interests.join(', ')
+              : 'No interests set'}
+          </Text>
+        </View>
+
+        {/* Bio Section */}
+        <View style={styles.bioSection}>
+          <Text style={styles.label}>Bio</Text>
+          <TextInput
+            style={styles.bioInput}
+            value={bio}
+            onChangeText={setBio}
+            placeholder="Tell us about yourself..."
+            placeholderTextColor="#999"
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+          />
+        </View>
+
+        {/* Save Button */}
+        <TouchableOpacity
+          style={[styles.saveButton, saving && styles.saveButtonDisabled]}
+          onPress={handleSaveBio}
+          disabled={saving}
+        >
+          <Text style={styles.saveButtonText}>
+            {saving ? 'Saving...' : 'Save Bio'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  mainContainer: {
+  container: {
     flex: 1,
-    width: '100%',
-    height: '100%',
+    backgroundColor: '#f5f5f5',
+  },
+  contentContainer: {
+    padding: 20,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#EAF2F9',
+    backgroundColor: '#f5f5f5',
   },
-  contentContainer: {
-    position: 'absolute',
-    width: '100%',
-    height: '86%',
-    backgroundColor: '#EAF2F9',
-    borderBottomLeftRadius: 34,
-    borderBottomRightRadius: 34,
-    shadowColor: 'rgba(11, 19, 66, 0.5)',
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 100,
-    shadowOpacity: 0.5,
-    elevation: 10,
-    overflow: 'hidden',
+  loadingText: {
+    fontSize: 18,
+    color: '#666',
   },
-  headerImage: {
-    width: '100%',
-    height: 250,
-    position: 'relative',
-  },
-  gradientOverlay: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.55)',
-    zIndex: 1,
-  },
-  headerGradient: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 100,
-    zIndex: 2,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    position: 'absolute',
-    width: '100%',
-    paddingHorizontal: 20,
-    top: 60,
-    zIndex: 3,
-  },
-  transparentView: {
-    width: 40,
-    height: 40,
-  },
-  contentWrapper: {
-    flex: 1,
-    paddingTop: 45,
-    backgroundColor: '#EAF2F9',
-  },
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#EAF2F9',
-  },
-  scrollView: {
-    flex: 1,
-    backgroundColor: '#EAF2F9',
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingBottom: 100,
-    paddingTop: 15,
-    backgroundColor: '#EAF2F9',
-  },
-  content: {
-    flex: 1,
-    alignItems: 'center',
-    padding: 20,
-    paddingTop: 10,
-    backgroundColor: '#EAF2F9',
-  },
-  profileInfoContainer: {
-    width: '100%',
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 8,
-    backgroundColor: 'transparent',
-  },
-  fullNameText: {
-    fontFamily: 'DMSans_700Bold',
-    fontSize: 36,
-    lineHeight: 40,
-    textAlign: 'center',
-    letterSpacing: -1.8,
-    color: '#000000',
-    width: '100%',
-  },
-  locationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    width: '100%',
-    height: 24,
-    backgroundColor: 'transparent',
-  },
-  flagContainer: {
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'transparent',
-  },
-  locationText: {
-    fontFamily: 'DMSans_500Medium',
-    fontSize: 16,
-    lineHeight: 24,
-    color: '#000000',
-  },
-  dot: {
-    fontFamily: 'DMSans_500Medium',
-    fontSize: 16,
-    lineHeight: 24,
-    color: '#000000',
-  },
-  friendsText: {
-    fontFamily: 'DMSans_500Medium',
-    fontSize: 16,
-    lineHeight: 24,
-    color: '#FF3B30',
-  },
-  interestsWrapper: {
-    width: '100%',
-    height: 80,
-    marginTop: 16,
-    backgroundColor: 'transparent',
-  },
-  interestsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    gap: 16,
-  },
-  interestItem: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-    minWidth: 48,
-    height: 80,
-    backgroundColor: 'transparent',
-  },
-  interestIconButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 3,
-    borderColor: '#EAF2F9',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    padding: 0,
-  },
-  interestEmoji: {
-    fontSize: 22,
-    lineHeight: 26,
-    backgroundColor: 'transparent',
-    marginTop: 1,
-  },
-  interestLabel: {
-    fontFamily: 'DMSans_500Medium',
-    fontSize: 12,
-    lineHeight: 16,
-    color: '#000000',
-    backgroundColor: 'transparent',
-    width: 'auto',
-    textAlign: 'center',
-    flexShrink: 1,
-    flexGrow: 0,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    width: '100%',
-    height: 50,
-    gap: 10,
-    marginTop: 16,
-    backgroundColor: 'transparent',
-  },
-  editButton: {
-    flex: 1,
-    height: 50,
-    backgroundColor: '#1F41BB',
-    borderRadius: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 35,
-  },
-  editButtonText: {
-    fontFamily: 'DMSans_500Medium',
-    fontSize: 16,
-    lineHeight: 20,
-    color: '#FFFFFF',
-    letterSpacing: -0.24,
-  },
-  shareButton: {
-    flex: 1,
-    height: 50,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 35,
-    borderWidth: 1,
-    borderColor: '#E5E5E5',
-  },
-  shareButtonText: {
-    fontFamily: 'DMSans_500Medium',
-    fontSize: 16,
-    lineHeight: 20,
-    color: '#000000',
-    letterSpacing: -0.24,
-  },
-  bioText: {
-    fontFamily: 'DMSans_400Regular',
-    fontSize: 16,
-    lineHeight: 20,
-    textAlign: 'center',
-    letterSpacing: -0.24,
-    color: '#000000',
-    marginTop: 16,
-  },
-  homeIndicator: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 100,
-    position: 'absolute',
-    bottom: 8,
-    alignSelf: 'center',
-  },
-  profileImageContainer: {
-    position: 'absolute',
-    width: 140,
-    height: 140,
-    left: '50%',
-    marginLeft: -70,
-    top: 170,
-    zIndex: 10,
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 24,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-    backgroundColor: 'transparent',
+    shadowRadius: 8,
+    elevation: 4,
   },
-  profileImage: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    borderWidth: 4,
-    borderColor: '#FFFFFF',
-    backgroundColor: 'transparent',
+  photoContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  profilePhoto: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 3,
+    borderColor: '#4694FD',
+  },
+  placeholderPhoto: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#e0e0e0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#4694FD',
+  },
+  placeholderText: {
+    color: '#999',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  infoSection: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  infoText: {
+    fontSize: 16,
+    color: '#666',
+    lineHeight: 22,
+  },
+  bioSection: {
+    marginBottom: 24,
+  },
+  bioInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    color: '#333',
+    backgroundColor: '#f9f9f9',
+    minHeight: 100,
+    maxHeight: 150,
+  },
+  saveButton: {
+    backgroundColor: '#4694FD',
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    shadowColor: '#4694FD',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  saveButtonDisabled: {
+    backgroundColor: '#ccc',
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  saveButtonText: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: '600',
   },
 });
 
