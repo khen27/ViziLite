@@ -28,43 +28,38 @@ const ProfileScreen = () => {
 
   const { user, setProfile } = authContext;
   
+  console.log('ProfileScreen – AuthContext user:', user);
+  
   const [bio, setBio] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [profileData, setProfileData] = useState<ProfileData>({});
   const [saving, setSaving] = useState<boolean>(false);
 
   useEffect(() => {
-    if (user?.uid) {
-      fetchUserProfile();
-    }
-  }, [user?.uid]);
-
-  const fetchUserProfile = async () => {
     if (!user?.uid) return;
 
-    try {
-      setLoading(true);
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDocSnap = await getDoc(userDocRef);
-
-      if (userDocSnap.exists()) {
-        const userData = userDocSnap.data();
-        
-        setProfileData({
-          name: userData.name || '',
-          interests: userData.interests || [],
-          photoUrl: userData.photoUrl || '',
-        });
-        
-        setBio(userData.bio || '');
+    const fetchProfile = async () => {
+      try {
+        const docRef = doc(db, 'users', user.uid);
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          setProfileData({
+            name: data.name,
+            interests: data.interests || [],
+            photoUrl: data.photoUrl,
+          });
+          setBio(data.bio || '');
+        }
+      } catch (err) {
+        console.warn('Error fetching profile:', err);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      Alert.alert('Error', 'Failed to load profile data');
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchProfile();
+  }, [user]);
 
   const handleSaveBio = async () => {
     try {
@@ -79,16 +74,17 @@ const ProfileScreen = () => {
     }
   };
 
-  if (loading) {
+  if (loading || !user) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Loading...</Text>
+      <View style={styles.center}>
+        <Text>Loading…</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <View style={styles.container}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.card}>
         {/* Profile Photo */}
         <View style={styles.photoContainer}>
@@ -146,6 +142,7 @@ const ProfileScreen = () => {
         </TouchableOpacity>
       </View>
     </ScrollView>
+    </View>
   );
 };
 
@@ -156,6 +153,12 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 20,
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
   },
   loadingContainer: {
     flex: 1,
