@@ -12,6 +12,7 @@ import {
 import { AuthContext } from '../context/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
+import ProfileCard from '../components/ProfileCard';
 
 interface ProfileData {
   name?: string;
@@ -83,9 +84,8 @@ const ProfileScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <View style={styles.card}>
+    <ScrollView contentContainerStyle={styles.scroll}>
+      <ProfileCard>
         {/* Profile Photo */}
         <View style={styles.photoContainer}>
           {profileData.photoUrl ? (
@@ -140,19 +140,15 @@ const ProfileScreen = () => {
             {saving ? 'Saving...' : 'Save Bio'}
           </Text>
         </TouchableOpacity>
-      </View>
+      </ProfileCard>
     </ScrollView>
-    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  scroll: {
+    flexGrow: 1,
     backgroundColor: '#f5f5f5',
-  },
-  contentContainer: {
-    padding: 20,
   },
   center: {
     flex: 1,
@@ -170,19 +166,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#666',
   },
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
+
   photoContainer: {
     alignItems: 'center',
     marginBottom: 24,

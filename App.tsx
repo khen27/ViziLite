@@ -17,7 +17,6 @@ import LinkedInScreen from './src/screens/LinkedInScreen';
 import TabNavigator from './src/navigation/TabNavigator';
 import { UserProvider } from './src/context/UserContext';
 import { AuthProvider } from './src/context/AuthContext';
-import PlanScreen from './src/screens/PlanScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -29,7 +28,6 @@ export type RootStackParamList = {
   Instagram: undefined;
   LinkedIn: undefined;
   MainTabs: undefined;
-  Plan: undefined;
   Chat: { chatId?: string; userId?: string };
   TripDetails: undefined;
 };
@@ -51,11 +49,6 @@ export default function App() {
                           <Stack.Screen name="Instagram" component={InstagramScreen} />
             <Stack.Screen name="LinkedIn" component={LinkedInScreen} />
             <Stack.Screen name="MainTabs" component={TabNavigator} />
-            <Stack.Screen 
-              name="Plan" 
-              component={PlanScreen} 
-              options={{ title: 'Plan', headerShown: true }}
-            />
             <Stack.Screen
               name="Chat"
               component={ChatScreen}

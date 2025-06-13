@@ -58,11 +58,10 @@ const PlanScreen = () => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
+      // Simplified query to avoid index requirement initially
       const plansQuery = query(
         collection(db, 'plans'),
-        where('uid', '==', user.uid),
-        where('date', '>=', today.toISOString().split('T')[0]),
-        orderBy('date', 'asc')
+        where('uid', '==', user.uid)
       );
 
       const querySnapshot = await getDocs(plansQuery);
@@ -70,16 +69,23 @@ const PlanScreen = () => {
 
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        fetchedPlans.push({
-          id: doc.id,
-          uid: data.uid,
-          date: data.date,
-          time: data.time,
-          activity: data.activity,
-          createdAt: data.createdAt?.toDate(),
-        });
+        const planDate = new Date(data.date);
+        
+        // Filter client-side for now (until index is created)
+        if (planDate >= today) {
+          fetchedPlans.push({
+            id: doc.id,
+            uid: data.uid,
+            date: data.date,
+            time: data.time,
+            activity: data.activity,
+            createdAt: data.createdAt?.toDate(),
+          });
+        }
       });
 
+      // Sort client-side
+      fetchedPlans.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
       setPlans(fetchedPlans);
     } catch (error) {
       console.error('Error fetching plans:', error);
