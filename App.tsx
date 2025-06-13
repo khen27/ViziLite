@@ -13,6 +13,7 @@ import ChatScreen from './src/screens/ChatScreen';
 import TripDetails from './src/screens/TripDetails';
 import { db } from './firebaseConfig';
 import InstagramScreen from './src/screens/InstagramScreen';
+import LinkedInScreen from './src/screens/LinkedInScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -22,6 +23,7 @@ export type RootStackParamList = {
   EmotionalCheckin: undefined;
   Interests: undefined;
   Instagram: undefined;
+  LinkedIn: undefined;
   Chat: { chatId?: string; userId?: string };
   TripDetails: undefined;
 };
@@ -39,6 +41,7 @@ export default function App() {
           <Stack.Screen name="Selfie" component={SelfieScreen} />
           <Stack.Screen name="Interests" component={InterestsScreen} />
           <Stack.Screen name="Instagram" component={InstagramScreen} />
+          <Stack.Screen name="LinkedIn" component={LinkedInScreen} />
           <Stack.Screen name="EmotionalCheckin" component={EmotionalCheckin} />
           <Stack.Screen
             name="Chat"
