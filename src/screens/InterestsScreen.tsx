@@ -189,7 +189,7 @@ const InterestsScreen = () => {
 
   const handleNext = () => {
     if (selectedInterests.size >= 10) {
-      navigation.navigate('EmotionalCheckin');
+      navigation.navigate('Instagram');
     }
   };
 
